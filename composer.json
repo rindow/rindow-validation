@@ -1,0 +1,41 @@
+{
+    "name": "rindow/rindow-validation",
+    "type": "library",
+    "description": "Entity object validator",
+    "keywords": ["rindow","framework","validation"],
+    "license": "BSD-3-Clause",
+    "require": {
+        "php": ">=5.3.3",
+        "interop-phpobjects/lenient-validation": "*",
+        "rindow/rindow-stdlib": "*"
+    },
+    "require-dev": {
+        "rindow/rindow-stdlib": "*",
+        "rindow/rindow-container": "*",
+        "rindow/rindow-annotation": "*",
+        "rindow/rindow-module-yaml": "*"
+    },
+    "suggest": {
+        "rindow/rindow-container": "It needs some service container",
+        "rindow/rindow-annotation": "It needs some annotation reader",
+        "rindow/rindow-module-yaml": "When using Yaml"
+    },
+    "autoload": {
+        "psr-0": {
+            "Rindow\\Validation\\": "src/"
+        }
+    },
+
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://rindow.github.io/rindow-packagist/packages.json",
+            "options": {
+                "ssl": {
+                    "verify_peer": "true"
+                }
+            }
+        }
+    ],
+    "minimum-stability": "dev"
+}

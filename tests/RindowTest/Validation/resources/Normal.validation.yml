@@ -1,0 +1,4 @@
+RindowTest\Validation\YamlConstraintContextBuilderTest\Normal:
+  properties:
+    id:
+      Max: 10
