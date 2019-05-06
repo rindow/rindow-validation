@@ -66,6 +66,7 @@ class Module
                         'constructor_args' => array(
                             'serviceLocator' => array('ref' => 'ServiceLocator'),
                             'annotationReader' => array('ref' => 'AnnotationReader'),
+                            'configCacheFactory' => array('ref' => 'ConfigCacheFactory'),
                         ),
                         'properties' => array(
                             'config' => array('config' => 'validator'),

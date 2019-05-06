@@ -4,8 +4,9 @@ namespace RindowTest\Validation\ValidatorTest;
 use PHPUnit\Framework\TestCase;
 use Rindow\Stdlib\Entity\AbstractEntity;
 use Rindow\Stdlib\Entity\PropertyAccessPolicy;
-use Rindow\Container\ModuleManager;
 use Rindow\Stdlib\I18n\Translator;
+use Rindow\Stdlib\Cache\ConfigCache\ConfigCacheFactory;
+use Rindow\Container\ModuleManager;
 use Rindow\Annotation\AnnotationManager;
 
 // Test Target Classes
@@ -205,9 +206,27 @@ class Test extends TestCase
 {
     public function setUp()
     {
-        usleep( RINDOW_TEST_CLEAR_CACHE_INTERVAL );
-        \Rindow\Stdlib\Cache\CacheFactory::clearCache();
-        usleep( RINDOW_TEST_CLEAR_CACHE_INTERVAL );
+    }
+
+    public function getConfigCacheFactory()
+    {
+        $config = array(
+                //'fileCachePath'   => __DIR__.'/../cache',
+                'configCache' => array(
+                    'enableMemCache'  => true,
+                    'enableFileCache' => true,
+                    'forceFileCache'  => false,
+                ),
+                //'apcTimeOut'      => 20,
+                'memCache' => array(
+                    'class' => 'Rindow\Stdlib\Cache\SimpleCache\ArrayCache',
+                ),
+                'fileCache' => array(
+                    'class' => 'Rindow\Stdlib\Cache\SimpleCache\ArrayCache',
+                ),
+        );
+        $configCacheFactory = new ConfigCacheFactory($config);
+        return $configCacheFactory;
     }
 
     public function encodeConsoleCode($text)
@@ -416,8 +435,9 @@ class Test extends TestCase
 
     public function testCache()
     {
-        // for non cache
-        $validator = new Validator(new AnnotationManager());
+        $configCacheFactory = $this->getConfigCacheFactory();
+        // miss cache
+        $validator = new Validator(new AnnotationManager($configCacheFactory));
 
         $product = new Product();
         $product->setId(11);
@@ -435,8 +455,8 @@ class Test extends TestCase
         $violation = $validator->validate($product);
         $this->assertEquals(0,count($violation));
 
-        // for cache
-        $validator = new Validator(new AnnotationManager());
+        // hit cache
+        $validator = new Validator(new AnnotationManager($configCacheFactory));
 
         $product = new Product();
         $product->setId(11);
@@ -713,6 +733,7 @@ class Test extends TestCase
                     'Rindow\Stdlib\I18n\Module' => true,
                 ),
                 'annotation_manager' => true,
+                'enableCache' => false,
             ),
         );
         $moduleManager = new ModuleManager($config);
@@ -736,6 +757,7 @@ class Test extends TestCase
                     'Rindow\Validation\Module' => true,
                 ),
                 'annotation_manager' => true,
+                'enableCache' => false,
             ),
         );
         $moduleManager = new ModuleManager($config);
@@ -794,6 +816,7 @@ class Test extends TestCase
                     'Rindow\Stdlib\I18n\Module' => true,
                 ),
                 'annotation_manager' => true,
+                'enableCache' => false,
             ),
             'validator' => array(
                 'builders' => array(
@@ -838,6 +861,7 @@ class Test extends TestCase
                     'Rindow\Stdlib\I18n\Module' => true,
                 ),
                 'annotation_manager' => true,
+                'enableCache' => false,
             ),
             'validator' => array(
                 'builders' => array(
@@ -882,6 +906,7 @@ class Test extends TestCase
                     'Rindow\Stdlib\I18n\Module' => true,
                 ),
                 'annotation_manager' => true,
+                'enableCache' => false,
             ),
         );
         $moduleManager = new ModuleManager($config);

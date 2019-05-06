@@ -34,9 +34,6 @@ class Test extends TestCase
     {
         if(self::$skip)
             $this->markTestSkipped();
-        usleep( RINDOW_TEST_CLEAR_CACHE_INTERVAL );
-        \Rindow\Stdlib\Cache\CacheFactory::clearCache();
-        usleep( RINDOW_TEST_CLEAR_CACHE_INTERVAL );
     }
 
     public function testNormal()
@@ -92,6 +89,7 @@ class Test extends TestCase
                     'Rindow\Module\Yaml\Module' => true,
                 ),
                 'annotation_manager' => true,
+                'enableCache' => false,
             ),
             'validator' => array(
                 'builders' => array(

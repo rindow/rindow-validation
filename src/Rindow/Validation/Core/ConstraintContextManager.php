@@ -1,9 +1,6 @@
 <?php
 namespace Rindow\Validation\Core;
 
-use Rindow\Annotation\AnnotationManager;
-use Rindow\Stdlib\Cache\CacheHandlerTemplate;
-
 use ReflectionClass;
 use Rindow\Annotation\ElementType;
 use Rindow\Annotation\AnnotationMetaData;
@@ -13,6 +10,7 @@ use Rindow\Validation\Constraints\CList;
 use Rindow\Validation\Builder\AnnotationConstraintContextBuilder;
 use Rindow\Validation\Builder\ArrayConstraintContextBuilder;
 use Rindow\Validation\Exception;
+use Rindow\Stdlib\Cache\ConfigCache\ConfigCacheFactory;
 
 class ConstraintContextManager implements ConstraintManager
 {
@@ -20,7 +18,8 @@ class ConstraintContextManager implements ConstraintManager
     const ARRAY_CONSTRAINT_CONTEXT_BUILDER = 'Rindow\\Validation\\Builder\\ArrayConstraintContextBuilder';
     const YAML_CONSTRAINT_CONTEXT_BUILDER = 'Rindow\\Validation\\Builder\\YamlConstraintContextBuilder';
 
-    protected $cacheHandler;
+    protected $configCacheFactory;
+    protected $constraintsCache;
     protected $builders = array();
     protected $serviceLocator;
     protected $annotationReader;
@@ -33,30 +32,29 @@ class ConstraintContextManager implements ConstraintManager
     public function __construct(
         $constraintValidatorFactory=null,
         $serviceLocator=null,
-        $annotationReader=null)
+        $annotationReader=null,
+        $configCacheFactory=null)
     {
-        $this->cacheHandler = new CacheHandlerTemplate(__CLASS__);
+        if($configCacheFactory)
+            $this->configCacheFactory = $configCacheFactory;
+        else
+            $this->configCacheFactory = new ConfigCacheFactory(array('enableCache'=>false));
+
         if($constraintValidatorFactory)
             $this->constraintValidatorFactory = $constraintValidatorFactory;
         else
             $this->constraintValidatorFactory = new ConstraintValidatorFactory();
+
         $this->serviceLocator =$serviceLocator;
         $this->annotationReader = $annotationReader;
     }
 
     public function getConstraintsCache()
     {
-        return $this->cacheHandler->getCache('constraints');
-    }
-
-    public function setEnableCache($enableCache=true)
-    {
-        $this->cacheHandler->setEnableCache($enableCache);
-    }
-
-    public function setCachePath($cachePath)
-    {
-        $this->cacheHandler->setCachePath($cachePath);
+        if($this->constraintsCache)
+            return $this->constraintsCache;
+        $this->constraintsCache = $this->configCacheFactory->create(__CLASS__.'/constraints');
+        return $this->constraintsCache;
     }
 
     public function setConfig(array $config=null)
@@ -136,22 +134,20 @@ class ConstraintContextManager implements ConstraintManager
     public function getConstraints($className)
     {
         $constraintsCache = $this->getConstraintsCache();
-        $manager = $this;
-        $constraints = $constraintsCache->get(
+        $constraints = $constraintsCache->getEx(
             $className,
-            false,
-            function ($cache,$className,&$entry) use ($manager) {
+            function ($key,$args) {
+                list($manager,$className) = $args;
                 $constraints = false;
                 foreach($manager->getBuilders() as $builder) {
                     $constraints = $builder->getConstraints($className);
                     if($constraints) {
-                        $entry = $constraints;
-                        return true;
+                        return $constraints;
                     }
                 }
-                $entry = array();
-                return true;
-            }
+                return array();
+            },
+            array($this,$className)
         );
         return $constraints;
     }
