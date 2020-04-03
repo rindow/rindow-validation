@@ -7,13 +7,13 @@
     "require": {
         "php": ">=5.3.3",
         "interop-phpobjects/lenient-validation": "*",
-        "rindow/rindow-stdlib": "*"
+        "rindow/rindow-stdlib": "1.*"
     },
     "require-dev": {
-        "rindow/rindow-stdlib": "*",
-        "rindow/rindow-container": "*",
-        "rindow/rindow-annotation": "*",
-        "rindow/rindow-module-yaml": "*"
+        "rindow/rindow-stdlib": "1.*",
+        "rindow/rindow-container": "1.*",
+        "rindow/rindow-annotation": "1.*",
+        "rindow/rindow-module-yaml": "1.*"
     },
     "suggest": {
         "rindow/rindow-container": "It needs some service container",
@@ -24,18 +24,5 @@
         "psr-0": {
             "Rindow\\Validation\\": "src/"
         }
-    },
-
-    "repositories": [
-        {
-            "type": "composer",
-            "url": "https://rindow.github.io/rindow-packagist/packages.json",
-            "options": {
-                "ssl": {
-                    "verify_peer": "true"
-                }
-            }
-        }
-    ],
-    "minimum-stability": "dev"
+    }
 }
